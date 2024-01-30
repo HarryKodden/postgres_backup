@@ -43,10 +43,3 @@ jobs:
           BACKUP_SUFFIX: "sql.gz"
         run: |
           bash -x backup.sh
-
-  test-docker:
-    if: ${{ github.event_name == 'pull_request' || github.ref != 'refs/heads/main' }}
-    needs: [test-script]
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
