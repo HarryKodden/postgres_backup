@@ -2,6 +2,8 @@
 
 set -eo pipefail
 
+mkdir -p /backups
+
 if [ "${POSTGRES_DATABASE}" = "**None**" -a "${POSTGRES_BACKUP_ALL}" != "true" ]; then
   echo "You need to set the POSTGRES_DATABASE environment variable."
   exit 1
