@@ -40,6 +40,7 @@ jobs:
           POSTGRES_PORT: 5432
           POSTGRES_EXTRA_OPTS: "-Z0"
           BACKUP_DIR: "/tmp"
+          BACKUP_SUFFIX: "sql.gz"
         run: |
           bash -x backup.sh
 
@@ -49,9 +50,3 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v2
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
