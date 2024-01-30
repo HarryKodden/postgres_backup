@@ -1,0 +1,58 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - "main"
+    paths-ignore:
+      - "**.md"
+      - ".gitignore"
+  pull_request:
+    paths-ignore:
+      - "**.md"
+      - ".github/**"
+
+jobs:
+  test-script:
+    runs-on: ubuntu-22.04
+    services:
+      postgres:
+        image: postgres:14
+        env:
+          POSTGRES_DB: "database"
+          POSTGRES_USER: "user"
+          POSTGRES_PASSWORD: "test"
+        ports:
+          - 5432:5432
+        # Set health checks to wait until postgres has started
+        options: --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    steps:
+      - uses: actions/checkout@v3
+      - name: Test backup script for pg_dump
+        env:
+          POSTGRES_DB: "database"
+          POSTGRES_USER: "user"
+          POSTGRES_PASSWORD: "test"
+          POSTGRES_HOST: "127.0.0.1"
+          POSTGRES_PORT: 5432
+          POSTGRES_EXTRA_OPTS: "-Z0"
+        run: |
+          bash -x backup.sh
+          echo "Generated backup..."
+          ls -laR "/backups"
+
+  test-docker:
+    if: ${{ github.event_name == 'pull_request' || github.ref != 'refs/heads/main' }}
+    needs: [test-script]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
