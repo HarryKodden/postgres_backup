@@ -34,7 +34,7 @@ if [ "${POSTGRES_BACKUP_ALL}" == "true" ]; then
   echo "Creating dump of all databases from ${POSTGRES_HOST}..."
   pg_dumpall ${POSTGRES_HOST_OPTS}  | gzip > ${DEST_FILE}
 
-  echo "SQL full backup successfully"
+  echo "SQL full backup created: ${DEST_FILE}"
 else
   for DB in ${POSTGRES_DATABASE}
   do
@@ -43,6 +43,6 @@ else
     echo "Creating dump of ${DB} database from ${POSTGRES_HOST}..."
     pg_dump ${POSTGRES_HOST_OPTS} ${DB} | gzip > ${DEST_FILE}
     
-    echo "SQL backup $DB successfully"
+    echo "Database ${DB} backup created: ${DEST_FILE}"
   done
 fi

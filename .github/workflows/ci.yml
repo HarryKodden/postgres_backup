@@ -42,8 +42,6 @@ jobs:
           BACKUP_DIR: "/tmp"
         run: |
           bash -x backup.sh
-          echo "Generated backup..."
-          ls -l "${BACKUP_DIR}/database*"
 
   test-docker:
     if: ${{ github.event_name == 'pull_request' || github.ref != 'refs/heads/main' }}
