@@ -2,7 +2,8 @@
 
 set -eo pipefail
 
-mkdir -p /backups
+#Initialize dirs
+mkdir -p "${BACKUP_DIR}"
 
 if [ "${POSTGRES_DATABASE}" = "**None**" -a "${POSTGRES_BACKUP_ALL}" != "true" ]; then
   echo "You need to set the POSTGRES_DATABASE environment variable."
@@ -28,20 +29,19 @@ POSTGRES_HOST_OPTS="-h $POSTGRES_HOST -p $POSTGRES_PORT -U $POSTGRES_USER $POSTG
 export PGPASSWORD=$POSTGRES_PASSWORD
 
 if [ "${POSTGRES_BACKUP_ALL}" == "true" ]; then
-  DEST_FILE=/backups/all_$(date +"%Y-%m-%dT%H:%M:%SZ").sql.gz
+  DEST_FILE=${BACKUP_DIR}/all_$(date +"%Y-%m-%dT%H:%M:%SZ").${BACKUP_SUFFIX}
   
   echo "Creating dump of all databases from ${POSTGRES_HOST}..."
-  pg_dumpall $POSTGRES_HOST_OPTS  | gzip > $DEST_FILE
+  pg_dumpall ${POSTGRES_HOST_OPTS}  | gzip > ${DEST_FILE}
 
   echo "SQL full backup successfully"
 else
-
-  for DB in $POSTGRES_DATABASE
+  for DB in ${POSTGRES_DATABASE}
   do
-    DEST_FILE=/backups/${DB}_$(date +"%Y-%m-%dT%H:%M:%SZ").sql.gz
+    DEST_FILE=${BACKUP_DIR}/${DB}_$(date +"%Y-%m-%dT%H:%M:%SZ").${BACKUP_SUFFIX}
 
     echo "Creating dump of ${DB} database from ${POSTGRES_HOST}..."
-    pg_dump $POSTGRES_HOST_OPTS $DB | gzip > $DEST_FILE
+    pg_dump ${POSTGRES_HOST_OPTS} ${DB} | gzip > ${DEST_FILE}
     
     echo "SQL backup $DB successfully"
   done
